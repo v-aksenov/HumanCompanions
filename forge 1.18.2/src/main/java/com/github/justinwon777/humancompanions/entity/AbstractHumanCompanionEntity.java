@@ -117,7 +117,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new AvoidCreeperGoal(this, Creeper.class, 10.0F, 1.5D, 1.5D));
         this.goalSelector.addGoal(3, new MoveBackToGuardGoal(this));
-        this.goalSelector.addGoal(3, new CustomFollowOwnerGoal(this, 1.3D, 8.0F, 2.5F, false));
+        this.goalSelector.addGoal(3, new WaterTeleportFollowOwnerGoal(this, 1.3D, 8.0F, 2.5F, false));
         this.goalSelector.addGoal(5, new CustomWaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -423,6 +423,20 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         }
 
         if (p_34288_ == DamageSource.FALL && !Config.FALL_DAMAGE.get()) {
+            return false;
+        }
+
+        if (p_34288_ == DamageSource.ON_FIRE
+                || p_34288_ == DamageSource.IN_FIRE
+                || p_34288_ == DamageSource.IN_WALL
+                || p_34288_ == DamageSource.DROWN
+                || p_34288_ == DamageSource.WITHER
+                || p_34288_ == DamageSource.FREEZE
+                || p_34288_ == DamageSource.MAGIC
+                || (p_34288_.getDirectEntity() != null
+                                && EntityType.PLAYER.equals(p_34288_.getDirectEntity().getType())
+        )
+        ) {
             return false;
         }
 

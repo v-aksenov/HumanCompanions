@@ -7,9 +7,9 @@ public class CustomFollowOwnerGoal extends FollowOwnerGoal {
 
     public AbstractHumanCompanionEntity companion;
 
-    public CustomFollowOwnerGoal(AbstractHumanCompanionEntity p_25294_, double p_25295_, float p_25296_, float p_25297_, boolean p_25298_) {
-        super(p_25294_, p_25295_, p_25296_, p_25297_, p_25298_);
-        this.companion = p_25294_;
+    public CustomFollowOwnerGoal(AbstractHumanCompanionEntity pTamable, double pSpeedModifier, float pStartDistance, float pStopDistance, boolean pCanFly) {
+        super(pTamable, pSpeedModifier, pStartDistance, pStopDistance, pCanFly);
+        this.companion = pTamable;
     }
 
     public boolean canUse() {
