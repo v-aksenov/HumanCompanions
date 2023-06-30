@@ -6,6 +6,7 @@ import com.github.justinwon777.humancompanions.core.EntityInit;
 import com.github.justinwon777.humancompanions.core.PacketHandler;
 import com.github.justinwon777.humancompanions.entity.ai.*;
 import com.github.justinwon777.humancompanions.networking.OpenInventoryPacket;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
@@ -114,7 +115,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new EatGoal(this));
-        this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(1, new CustomSetOrderedToSitGoal(this));
         this.goalSelector.addGoal(2, new AvoidCreeperGoal(this, Creeper.class, 10.0F, 1.5D, 1.5D));
         this.goalSelector.addGoal(3, new MoveBackToGuardGoal(this));
         this.goalSelector.addGoal(3, new WaterTeleportFollowOwnerGoal(this, 1.3D, 8.0F, 2.5F, false));
@@ -418,6 +419,9 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     }
 
     public boolean hurt(DamageSource p_34288_, float p_34289_) {
+        if (isInvulnerable()) {
+            return false;
+        }
         if (p_34288_.getEntity() == this.getOwner() && !Config.FRIENDLY_FIRE_PLAYER.get()) {
             return false;
         }
@@ -463,7 +467,19 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     }
 
     public void die(DamageSource source) {
-        super.die(source);
+        clearTarget();
+        setHealth(getMaxHealth());
+        setOrderedToSit(true);
+        setInSittingPose(true);
+        if (getOwner() != null) {
+            net.minecraft.network.chat.Component deathMessage = this.getCombatTracker().getDeathMessage();
+            this.getOwner().sendMessage(deathMessage, getUUID());
+        }
+    }
+
+    public void setInSittingPose(boolean pSitting) {
+        setInvulnerable(pSitting);
+        super.setInSittingPose(pSitting);
     }
 
     protected void dropEquipment() {
@@ -636,6 +652,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         setStationery(false);
         setPatrolRadius(15);
         setFoodRequirements();
+        setInvulnerable(false);
         if (this.isOrderedToSit()) {
             this.setOrderedToSit(false);
         }

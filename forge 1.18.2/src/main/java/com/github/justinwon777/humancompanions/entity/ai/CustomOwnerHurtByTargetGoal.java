@@ -3,6 +3,8 @@ package com.github.justinwon777.humancompanions.entity.ai;
 import java.util.EnumSet;
 
 import com.github.justinwon777.humancompanions.core.Config;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -47,12 +49,18 @@ public class CustomOwnerHurtByTargetGoal extends TargetGoal {
     }
 
     public void start() {
-        this.mob.setTarget(this.ownerLastHurtBy);
-        LivingEntity livingentity = this.tameAnimal.getOwner();
-        if (livingentity != null) {
-            this.timestamp = livingentity.getLastHurtByMobTimestamp();
+        TextComponent text = new TextComponent("I was hurt! Attack the target! Sitting = " + this.tameAnimal.isOrderedToSit());
+        if (this.tameAnimal.isTame() && this.tameAnimal.getOwner() != null) {
+            this.tameAnimal.getOwner().sendMessage(new TranslatableComponent("chat.type.text", this.tameAnimal.getDisplayName(), text),
+                    this.tameAnimal.getUUID());
         }
-
-        super.start();
+        if (!this.tameAnimal.isOrderedToSit()) {
+            this.mob.setTarget(this.ownerLastHurtBy);
+            LivingEntity livingentity = this.tameAnimal.getOwner();
+            if (livingentity != null) {
+                this.timestamp = livingentity.getLastHurtByMobTimestamp();
+            }
+            super.start();
+        }
     }
 }
