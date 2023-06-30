@@ -25,7 +25,7 @@ public class CustomOwnerHurtTargetGoal extends TargetGoal {
     }
 
     public boolean canUse() {
-        if (this.tameAnimal.isTame() && !this.tameAnimal.isOrderedToSit()) {
+        if (this.tameAnimal.isTame() && !this.tameAnimal.isOrderedToSit() && tameAnimal.getHealth() > 1.0F) {
             LivingEntity livingentity = this.tameAnimal.getOwner();
             if (livingentity == null) {
                 return false;
@@ -53,7 +53,7 @@ public class CustomOwnerHurtTargetGoal extends TargetGoal {
     }
 
     public void start() {
-        TextComponent text = new TextComponent("Protect the owner! Sitting = " + this.tameAnimal.isOrderedToSit());
+        TextComponent text = new TextComponent("Help owner!");
         if (this.tameAnimal.isTame() && this.tameAnimal.getOwner() != null) {
             this.tameAnimal.getOwner().sendMessage(new TranslatableComponent("chat.type.text", this.tameAnimal.getDisplayName(), text),
                     this.tameAnimal.getUUID());
@@ -67,5 +67,12 @@ public class CustomOwnerHurtTargetGoal extends TargetGoal {
 
             super.start();
         }
+    }
+
+    public void stop() {
+        this.mob.setTarget(null);
+        this.targetMob = null;
+        this.tameAnimal.setTarget(null);
+        this.tameAnimal.setAggressive(false);
     }
 }

@@ -28,7 +28,12 @@ public class CustomSetOrderedToSitGoal extends Goal {
         } else if (!this.tameAnimal.isOnGround()) {
             return false;
         } else {
-            return true;
+            LivingEntity $$0 = this.tameAnimal.getOwner();
+            if ($$0 == null) {
+                return true;
+            } else {
+                return this.tameAnimal.isOrderedToSit();
+            }
         }
     }
 
@@ -38,20 +43,10 @@ public class CustomSetOrderedToSitGoal extends Goal {
         this.tameAnimal.setTarget(null);
         this.tameAnimal.setAggressive(false);
         this.tameAnimal.setInvulnerable(true);
-        TextComponent text = new TextComponent("Start Sitting! Sitting = " + this.tameAnimal.isOrderedToSit());
-        if (this.tameAnimal.isTame() && this.tameAnimal.getOwner() != null) {
-            this.tameAnimal.getOwner().sendMessage(new TranslatableComponent("chat.type.text", this.tameAnimal.getDisplayName(), text),
-                    this.tameAnimal.getUUID());
-        }
     }
 
     public void stop() {
         this.tameAnimal.setInSittingPose(false);
         this.tameAnimal.setInvulnerable(false);
-        TextComponent text = new TextComponent("Stop Sitting! Sitting = " + this.tameAnimal.isOrderedToSit());
-        if (this.tameAnimal.isTame() && this.tameAnimal.getOwner() != null) {
-            this.tameAnimal.getOwner().sendMessage(new TranslatableComponent("chat.type.text", this.tameAnimal.getDisplayName(), text),
-                    this.tameAnimal.getUUID());
-        }
     }
 }

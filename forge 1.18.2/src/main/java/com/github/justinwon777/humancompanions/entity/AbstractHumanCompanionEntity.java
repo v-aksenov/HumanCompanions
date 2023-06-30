@@ -115,7 +115,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(0, new EatGoal(this));
-        this.goalSelector.addGoal(1, new CustomSetOrderedToSitGoal(this));
+        this.goalSelector.addGoal(0, new CustomSetOrderedToSitGoal(this));
         this.goalSelector.addGoal(2, new AvoidCreeperGoal(this, Creeper.class, 10.0F, 1.5D, 1.5D));
         this.goalSelector.addGoal(3, new MoveBackToGuardGoal(this));
         this.goalSelector.addGoal(3, new WaterTeleportFollowOwnerGoal(this, 1.3D, 8.0F, 2.5F, false));
@@ -468,7 +468,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
 
     public void die(DamageSource source) {
         clearTarget();
-        setHealth(getMaxHealth());
+        setHealth(0.1F);
         setOrderedToSit(true);
         setInSittingPose(true);
         if (getOwner() != null) {
