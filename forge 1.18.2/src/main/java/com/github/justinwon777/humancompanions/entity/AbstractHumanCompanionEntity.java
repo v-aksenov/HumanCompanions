@@ -6,7 +6,6 @@ import com.github.justinwon777.humancompanions.core.EntityInit;
 import com.github.justinwon777.humancompanions.core.PacketHandler;
 import com.github.justinwon777.humancompanions.entity.ai.*;
 import com.github.justinwon777.humancompanions.networking.OpenInventoryPacket;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
@@ -18,20 +17,28 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.*;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.OpenDoorGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -126,7 +133,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         this.goalSelector.addGoal(9, new LowHealthGoal(this));
         this.targetSelector.addGoal(1, new CustomOwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new CustomOwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(3, (new HurtByTargetGoal(this)).setAlertOthers());
+        this.targetSelector.addGoal(3, (new CustomHurtByTargetGoal(this)).setAlertOthers());
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -418,34 +425,39 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         }
     }
 
-    public boolean hurt(DamageSource p_34288_, float p_34289_) {
+    public boolean hurt(DamageSource damageSource, float p_34289_) {
         if (isInvulnerable()) {
             return false;
         }
-        if (p_34288_.getEntity() == this.getOwner() && !Config.FRIENDLY_FIRE_PLAYER.get()) {
+        if (damageSource.getEntity() == this.getOwner()) {
             return false;
         }
-
-        if (p_34288_ == DamageSource.FALL && !Config.FALL_DAMAGE.get()) {
+        if (damageSource.getEntity() != null
+                && (damageSource.getEntity() instanceof TamableAnimal
+                                || EntityType.PLAYER.equals(damageSource.getEntity().getType()))
+        )
+        {
             return false;
+
         }
 
-        if (p_34288_ == DamageSource.ON_FIRE
-                || p_34288_ == DamageSource.IN_FIRE
-                || p_34288_ == DamageSource.IN_WALL
-                || p_34288_ == DamageSource.DROWN
-                || p_34288_ == DamageSource.WITHER
-                || p_34288_ == DamageSource.FREEZE
-                || p_34288_ == DamageSource.MAGIC
-                || (p_34288_.getDirectEntity() != null
-                                && EntityType.PLAYER.equals(p_34288_.getDirectEntity().getType())
+        if (damageSource == DamageSource.FALL 
+                || damageSource == DamageSource.ON_FIRE
+                || damageSource == DamageSource.IN_FIRE
+                || damageSource == DamageSource.IN_WALL
+                || damageSource == DamageSource.DROWN
+                || damageSource == DamageSource.WITHER
+                || damageSource == DamageSource.FREEZE
+                || damageSource == DamageSource.MAGIC
+                || (damageSource.getDirectEntity() != null
+                                && EntityType.PLAYER.equals(damageSource.getDirectEntity().getType())
         )
         ) {
             return false;
         }
 
-        hurtArmor(p_34288_, p_34289_);
-        return super.hurt(p_34288_, p_34289_);
+        hurtArmor(damageSource, p_34289_);
+        return super.hurt(damageSource, p_34289_);
     }
 
     public void hurtArmor(DamageSource p_150073_, float p_150074_) {
@@ -493,7 +505,11 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
 
     public boolean doHurtTarget(Entity entity) {
         ItemStack itemstack = this.getMainHandItem();
-        if (!this.level.isClientSide && !itemstack.isEmpty() && entity instanceof LivingEntity) {
+        if (!this.level.isClientSide && !itemstack.isEmpty()
+                && entity instanceof LivingEntity
+                && !(entity instanceof TamableAnimal)
+                && entity.getType() != EntityType.PLAYER
+        ) {
             itemstack.hurtAndBreak(1, this, (p_43296_) -> {
                 p_43296_.broadcastBreakEvent(EquipmentSlot.MAINHAND);
             });

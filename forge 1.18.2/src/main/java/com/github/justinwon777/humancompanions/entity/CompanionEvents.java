@@ -23,13 +23,9 @@ public class CompanionEvents {
     @SubscribeEvent
     public static void friendlyFire(final LivingAttackEvent event) {
         if (event.getSource().getEntity() instanceof AbstractHumanCompanionEntity companion && companion.isTame()) {
-            if (!Config.FRIENDLY_FIRE_PLAYER.get()) {
-                if (event.getEntity() instanceof Player player) {
-                    if (companion.getOwner() == player) {
-                        event.setCanceled(true);
-                        return;
-                    }
-                }
+            if (event.getEntity() instanceof Player || event.getEntity() instanceof TamableAnimal) {
+                event.setCanceled(true);
+                return;
             }
             if (!Config.FRIENDLY_FIRE_COMPANIONS.get()) {
                 if (event.getEntity() instanceof TamableAnimal entity) {

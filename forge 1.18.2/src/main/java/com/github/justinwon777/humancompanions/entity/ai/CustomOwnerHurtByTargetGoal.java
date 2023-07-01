@@ -1,15 +1,15 @@
 package com.github.justinwon777.humancompanions.entity.ai;
 
-import java.util.EnumSet;
-
-import com.github.justinwon777.humancompanions.core.Config;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+
+import java.util.EnumSet;
 
 public class CustomOwnerHurtByTargetGoal extends TargetGoal {
     private final TamableAnimal tameAnimal;
@@ -29,16 +29,8 @@ public class CustomOwnerHurtByTargetGoal extends TargetGoal {
                 return false;
             } else {
                 this.ownerLastHurtBy = livingentity.getLastHurtByMob();
-                if (this.ownerLastHurtBy instanceof TamableAnimal) {
-                    if (((TamableAnimal) this.ownerLastHurtBy).isTame()) {
-                        LivingEntity owner1 = ((TamableAnimal) this.ownerLastHurtBy).getOwner();
-                        LivingEntity owner2 = this.tameAnimal.getOwner();
-                        if (owner1 == owner2) {
-                            if (!Config.FRIENDLY_FIRE_COMPANIONS.get()) {
-                                return false;
-                            }
-                        }
-                    }
+                if (this.ownerLastHurtBy instanceof TamableAnimal || ownerLastHurtBy != null && ownerLastHurtBy.getType() == EntityType.PLAYER) {
+                    return false;
                 }
                 int i = livingentity.getLastHurtByMobTimestamp();
                 return i != this.timestamp && this.canAttack(this.ownerLastHurtBy, TargetingConditions.DEFAULT) && this.tameAnimal.wantsToAttack(this.ownerLastHurtBy, livingentity);

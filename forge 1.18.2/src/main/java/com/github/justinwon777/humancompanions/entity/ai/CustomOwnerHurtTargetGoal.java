@@ -1,10 +1,8 @@
 package com.github.justinwon777.humancompanions.entity.ai;
 
-import java.util.EnumSet;
-
-import com.github.justinwon777.humancompanions.core.Config;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -12,6 +10,8 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Creeper;
+
+import java.util.EnumSet;
 
 public class CustomOwnerHurtTargetGoal extends TargetGoal {
     private final TamableAnimal tameAnimal;
@@ -31,16 +31,8 @@ public class CustomOwnerHurtTargetGoal extends TargetGoal {
                 return false;
             } else {
                 this.ownerLastHurt = livingentity.getLastHurtMob();
-                if (this.ownerLastHurt instanceof TamableAnimal) {
-                    if (((TamableAnimal) this.ownerLastHurt).isTame()) {
-                        LivingEntity owner1 = ((TamableAnimal) this.ownerLastHurt).getOwner();
-                        LivingEntity owner2 = this.tameAnimal.getOwner();
-                        if (owner1 == owner2) {
-                            if (!Config.FRIENDLY_FIRE_COMPANIONS.get()) {
-                                return false;
-                            }
-                        }
-                    }
+                if (this.ownerLastHurt instanceof TamableAnimal || ownerLastHurt != null && ownerLastHurt.getType() == EntityType.PLAYER) {
+                    return false;
                 } else if (this.ownerLastHurt instanceof Creeper || this.ownerLastHurt instanceof ArmorStand) {
                     return false;
                 }
