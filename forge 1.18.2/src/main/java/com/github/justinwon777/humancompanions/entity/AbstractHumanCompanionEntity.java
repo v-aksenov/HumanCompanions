@@ -131,9 +131,9 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(8, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(9, new LowHealthGoal(this));
-        this.targetSelector.addGoal(1, new CustomOwnerHurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new CustomOwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(3, (new CustomHurtByTargetGoal(this)).setAlertOthers());
+        this.targetSelector.addGoal(4, new CustomOwnerHurtByTargetGoal(this));
+        this.targetSelector.addGoal(5, new CustomOwnerHurtTargetGoal(this));
+        this.targetSelector.addGoal(6, (new CustomHurtByTargetGoal(this)).setAlertOthers());
     }
 
     public static AttributeSupplier.Builder createAttributes() {
