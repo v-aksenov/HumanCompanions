@@ -459,6 +459,7 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         if (damageSource == DamageSource.FALL 
                 || damageSource == DamageSource.ON_FIRE
                 || damageSource == DamageSource.IN_FIRE
+                || damageSource == DamageSource.LAVA
                 || damageSource == DamageSource.IN_WALL
                 || damageSource == DamageSource.DROWN
                 || damageSource == DamageSource.WITHER
@@ -496,8 +497,6 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
     public void die(DamageSource source) {
         clearTarget();
         setHealth(0.1F);
-        setOrderedToSit(true);
-        setInSittingPose(true);
         if (getOwner() != null) {
             net.minecraft.network.chat.Component deathMessage = this.getCombatTracker().getDeathMessage();
             this.getOwner().sendMessage(deathMessage, getUUID());
