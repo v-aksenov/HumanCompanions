@@ -56,6 +56,7 @@ public class ArbalistRangedCrossbowAttackGoal<T extends AbstractHumanCompanionEn
         this.mob.setTarget(null);
         this.mob.setChargingCrossbow(false);
         CrossbowItem.setCharged(this.mob.getUseItem(), false);
+        this.crossbowState = ArbalistRangedCrossbowAttackGoal.CrossbowState.UNCHARGED;
         this.seeTime = 0;
         if (this.mob.isUsingItem()) {
             this.mob.stopUsingItem();

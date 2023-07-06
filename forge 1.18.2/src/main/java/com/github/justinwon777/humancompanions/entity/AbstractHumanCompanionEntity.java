@@ -355,6 +355,21 @@ public class AbstractHumanCompanionEntity extends TamableAnimal {
         return super.mobInteract(player, hand);
     }
 
+    public void dropLeash(boolean pBroadcastPacket, boolean pDropLeash) {
+        super.dropLeash(pBroadcastPacket, pDropLeash);
+        if (targetSelector.getAvailableGoals().isEmpty()) {
+            this.targetSelector.addGoal(1, new CustomOwnerHurtByTargetGoal(this));
+            this.targetSelector.addGoal(2, new CustomOwnerHurtTargetGoal(this));
+            this.targetSelector.addGoal(3, (new CustomHurtByTargetGoal(this)).setAlertOthers());
+        }
+    }
+
+    private void logTargetGoal() {
+        TextComponent text = new TextComponent("targetSelector: " + targetSelector.getAvailableGoals().stream().map(it -> it.getGoal().getClass().getSimpleName()).toList());
+        getOwner().sendMessage(new TranslatableComponent("chat.type.text", this.getDisplayName(),
+                text), this.getUUID());
+    }
+
     public void openGui(ServerPlayer player) {
         if (player.containerMenu != player.inventoryMenu) {
             player.closeContainer();

@@ -20,6 +20,7 @@ public class CompanionEvents {
         }
     }
 
+
     @SubscribeEvent
     public static void friendlyFire(final LivingAttackEvent event) {
         if (event.getSource().getEntity() instanceof AbstractHumanCompanionEntity companion && companion.isTame()) {
